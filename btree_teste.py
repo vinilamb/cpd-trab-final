@@ -52,6 +52,6 @@ while True:
         print("NÚMERO!!!")
         continue
     
-    btree.insere_arvore(arvore, int(comStr))
+    arvore.insere(int(comStr))
 
     gera_grafo_arvore()

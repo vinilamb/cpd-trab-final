@@ -1,23 +1,6 @@
 import bisect
 
-class Nodo:
-    def __init__(self):
-        self.filhos = []
-        self.chaves = []
-        self.folha = False
-
-    def insere(self, chave): pass
-
-class ArvoreB:
-    def __init__(self, ordem = 3):
-        self.raiz = Nodo()
-        self.ordem = ordem
-        self.raiz.folha = True
-
-    def insere(self, chave):
-        self.raiz.insere(chave)
-
-def busca_nodo(nodo: Nodo, chave):
+def busca_nodo(nodo: 'Nodo', chave):
     indiceChave = 0
 
     while indiceChave < len(nodo.chaves) and chave > nodo.chaves[indiceChave]:
@@ -37,56 +20,70 @@ def busca_nodo(nodo: Nodo, chave):
     return busca_nodo(nodo, chave)
 
 # No tem 2t + 1 chaves
-def particiona_filhos_arvore_b(x: Nodo, i: int, t: int):
+def particiona_filhos_arvore_b(pai: 'Nodo', indice: int, ordem: int):
     z = Nodo()
-    y:Nodo = x.filhos[i]
+    y:Nodo = pai.filhos[indice]
     z.folha = y.folha
 
-    meio = y.chaves[t]
-    esq = y.chaves[0:t]
-    dir = y.chaves[t+1:]
+    meio = y.chaves[ordem]
+    esq = y.chaves[0:ordem]
+    dir = y.chaves[ordem+1:]
 
     z.chaves = dir
 
     if not y.folha:
-        z.filhos = y.filhos[t+1:]
-        y.filhos = y.filhos[:t+1]
+        z.filhos = y.filhos[ordem+1:]
+        y.filhos = y.filhos[:ordem+1]
     
-    x.filhos.insert(i + 1, z)
-    x.chaves.insert(i, meio)
+    pai.filhos.insert(indice + 1, z)
+    pai.chaves.insert(indice, meio)
 
     y.chaves = esq
 
-
-def insere_no_nodo(x: Nodo, c, t:int):
-    if x.folha:
-        bisect.insort(x.chaves, c)
+def insere_no_nodo(nodo: 'Nodo', chave, ordem:int):
+    if nodo.folha:
+        bisect.insort(nodo.chaves, chave)
     else:
         i = 0
-        while i < len(x.chaves) and x.chaves[i] < c:
+        while i < len(nodo.chaves) and nodo.chaves[i] < chave:
             i = i + 1
             
         try:
-            y = x.filhos[i]
+            y = nodo.filhos[i]
         except IndexError as e:
-            print(f'len filhos: {len(x.filhos)}, index: {i}') 
-            print(f'chaves: {x.chaves}')
+            print(f'len filhos: {len(nodo.filhos)}, index: {i}') 
+            print(f'chaves: {nodo.chaves}')
             raise e
         
-        overflow = insere_no_nodo(y, c, t)
+        overflow = insere_no_nodo(y, chave, ordem)
         if overflow:
-            particiona_filhos_arvore_b(x, i, t)
+            particiona_filhos_arvore_b(nodo, i, ordem)
 
-    return len(x.chaves) > 2*t
+    return len(nodo.chaves) > 2*ordem
 
-def insere_arvore(T: ArvoreB, c):
-    r = T.raiz
-
-    overflow = insere_no_nodo(r, c, T.ordem)
+def insere_arvore(arvore: 'ArvoreB', chave):
+    r = arvore.raiz
+    
+    overflow = insere_no_nodo(r, chave, arvore.ordem)
 
     if overflow:
         s = Nodo()
-        T.raiz = s
+        arvore.raiz = s
         s.folha = False
         s.filhos.append(r)
-        particiona_filhos_arvore_b(s, 0, T.ordem)
+        particiona_filhos_arvore_b(s, 0, arvore.ordem)
+
+class Nodo:
+    def __init__(self):
+        self.filhos = []
+        self.chaves = []
+        self.folha = False
+
+class ArvoreB:
+    def __init__(self, ordem:int = 3):
+        self.raiz = Nodo()
+        self.ordem = ordem
+        self.raiz.folha = True
+
+    def insere(self, chave:int):
+        insere_arvore(self, chave)
