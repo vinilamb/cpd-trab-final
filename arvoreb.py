@@ -21,24 +21,24 @@ def busca_nodo(nodo: 'Nodo', chave):
 
 # No tem 2t + 1 chaves
 def particiona_filhos_arvore_b(pai: 'Nodo', indice: int, ordem: int):
-    z = Nodo()
-    y:Nodo = pai.filhos[indice]
-    z.folha = y.folha
+    nodoMaior = Nodo()
+    nodoMenor:Nodo = pai.filhos[indice]
+    nodoMaior.folha = nodoMenor.folha
 
-    meio = y.chaves[ordem]
-    esq = y.chaves[0:ordem]
-    dir = y.chaves[ordem+1:]
+    meio = nodoMenor.chaves[ordem]
+    esq = nodoMenor.chaves[0:ordem]
+    dir = nodoMenor.chaves[ordem+1:]
 
-    z.chaves = dir
+    nodoMaior.chaves = dir
 
-    if not y.folha:
-        z.filhos = y.filhos[ordem+1:]
-        y.filhos = y.filhos[:ordem+1]
+    if not nodoMenor.folha:
+        nodoMaior.filhos = nodoMenor.filhos[ordem+1:]
+        nodoMenor.filhos = nodoMenor.filhos[:ordem+1]
     
-    pai.filhos.insert(indice + 1, z)
+    pai.filhos.insert(indice + 1, nodoMaior)
     pai.chaves.insert(indice, meio)
 
-    y.chaves = esq
+    nodoMenor.chaves = esq
 
 def insere_no_nodo(nodo: 'Nodo', chave, ordem:int):
     if nodo.folha:
