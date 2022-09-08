@@ -3,33 +3,20 @@ import graphviz
 
 arvore = btree.ArvoreB(2)
 
-def imprime_arvore():
-    nivel = 1
-    nodos = [arvore.raiz] 
-    while True:
-        linha = f'{nivel}: ' + " | ".join([('F' if n.folha else 'I' ) + ':' + str(n.chaves) for n in nodos])
-        print(linha)
-
-        if nodos[0].folha:
-            break
-        
-        listaFilhos = [] 
-        for nodos in [x.filhos for x in nodos]:
-            listaFilhos = listaFilhos + nodos
-        
-        nodos = listaFilhos
-        nivel = nivel + 1
-
 def nodeStr(node): return ";".join(map(str, node.chaves))
 
 def gera_grafo_arvore():
     dot = graphviz.Graph()
     
+    def nodeText(nodo: btree.Nodo):
+        print(nodo.registros)
+        return ";".join(str(r.chave) for r in nodo.registros)
+
     ordem = 0
     def addNode(node, nomePai=None):
         nonlocal ordem
         nome = f'n{ordem}'
-        dot.node(nome, label=";".join(map(str, node.chaves)))
+        dot.node(nome, label=nodeText(node))
         if nomePai:
             dot.edge(nomePai, nome)
         if not node.folha:
@@ -52,6 +39,7 @@ while True:
         print("NÚMERO!!!")
         continue
     
-    arvore.insere(int(comStr))
+    reg = btree.Registro(numero, None)
+    arvore.insere(reg)
 
     gera_grafo_arvore()

@@ -1,4 +1,6 @@
 import bisect
+from turtle import register_shape
+from typing import NamedTuple
 
 def busca_nodo(nodo: 'Nodo', chave):
     indiceChave = 0
@@ -25,46 +27,43 @@ def particiona_filhos_arvore_b(pai: 'Nodo', indice: int, ordem: int):
     nodoMenor:Nodo = pai.filhos[indice]
     nodoMaior.folha = nodoMenor.folha
 
-    meio = nodoMenor.chaves[ordem]
-    esq = nodoMenor.chaves[0:ordem]
-    dir = nodoMenor.chaves[ordem+1:]
+    meio = nodoMenor.registros[ordem]
+    esq = nodoMenor.registros[0:ordem]
+    dir = nodoMenor.registros[ordem+1:]
 
-    nodoMaior.chaves = dir
+    nodoMaior.registros = dir
 
     if not nodoMenor.folha:
         nodoMaior.filhos = nodoMenor.filhos[ordem+1:]
         nodoMenor.filhos = nodoMenor.filhos[:ordem+1]
     
     pai.filhos.insert(indice + 1, nodoMaior)
-    pai.chaves.insert(indice, meio)
+    pai.registros.insert(indice, meio)
 
-    nodoMenor.chaves = esq
+    nodoMenor.registros = esq
 
-def insere_no_nodo(nodo: 'Nodo', chave, ordem:int):
+def insere_no_nodo(nodo: 'Nodo', registro: 'Registro', ordem:int):
+    chave = registro.chave
+    
     if nodo.folha:
-        bisect.insort(nodo.chaves, chave)
+        bisect.insort(nodo.registros, registro, key=lambda r: r.chave)
     else:
         i = 0
-        while i < len(nodo.chaves) and nodo.chaves[i] < chave:
+        while i < len(nodo.registros) and nodo.registros[i].chave < chave:
             i = i + 1
             
-        try:
-            y = nodo.filhos[i]
-        except IndexError as e:
-            print(f'len filhos: {len(nodo.filhos)}, index: {i}') 
-            print(f'chaves: {nodo.chaves}')
-            raise e
+        y = nodo.filhos[i]
         
-        overflow = insere_no_nodo(y, chave, ordem)
+        overflow = insere_no_nodo(y, registro, ordem)
         if overflow:
             particiona_filhos_arvore_b(nodo, i, ordem)
 
-    return len(nodo.chaves) > 2*ordem
+    return len(nodo.registros) > 2*ordem
 
-def insere_arvore(arvore: 'ArvoreB', chave):
+def insere_arvore(arvore: 'ArvoreB', registro: 'Registro'):
     r = arvore.raiz
     
-    overflow = insere_no_nodo(r, chave, arvore.ordem)
+    overflow = insere_no_nodo(r, registro, arvore.ordem)
 
     if overflow:
         s = Nodo()
@@ -73,10 +72,14 @@ def insere_arvore(arvore: 'ArvoreB', chave):
         s.filhos.append(r)
         particiona_filhos_arvore_b(s, 0, arvore.ordem)
 
+class Registro(NamedTuple):
+    chave:any
+    valor:any
+
 class Nodo:
     def __init__(self):
+        self.registros = []
         self.filhos = []
-        self.chaves = []
         self.folha = False
 
 class ArvoreB:
@@ -85,5 +88,5 @@ class ArvoreB:
         self.ordem = ordem
         self.raiz.folha = True
 
-    def insere(self, chave:int):
-        insere_arvore(self, chave)
+    def insere(self, registro: Registro):
+        insere_arvore(self, registro)
