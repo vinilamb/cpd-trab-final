@@ -1,6 +1,7 @@
 import arvoreb as btree
+import graphviz
 
-arvore = btree.ArvoreB(1)
+arvore = btree.ArvoreB(2)
 
 def imprime_arvore():
     nivel = 1
@@ -19,6 +20,27 @@ def imprime_arvore():
         nodos = listaFilhos
         nivel = nivel + 1
 
+def nodeStr(node): return ";".join(map(str, node.chaves))
+
+def gera_grafo_arvore():
+    dot = graphviz.Graph()
+    
+    ordem = 0
+    def addNode(node, nomePai=None):
+        nonlocal ordem
+        nome = f'n{ordem}'
+        dot.node(nome, label=";".join(map(str, node.chaves)))
+        if nomePai:
+            dot.edge(nomePai, nome)
+        if not node.folha:
+            for filho in node.filhos:
+                ordem = ordem + 1
+                addNode(filho, nome)
+
+    addNode(arvore.raiz, 0)
+
+    dot.render(outfile='grafo.png', cleanup=True)
+
 while True:
     try:
         comStr = input("Digite um número para inserir na árvore B: ")
@@ -32,4 +54,4 @@ while True:
     
     btree.insere_arvore(arvore, int(comStr))
 
-    imprime_arvore()
+    gera_grafo_arvore()

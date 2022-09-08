@@ -42,30 +42,40 @@ def particiona_filhos_arvore_b(x: Nodo, i: int, t: int):
     y:Nodo = x.filhos[i]
     z.folha = y.folha
 
-    z.chaves = y.chaves[t+1:]
+    meio = y.chaves[t]
+    esq = y.chaves[0:t]
+    dir = y.chaves[t+1:]
+
+    z.chaves = dir
 
     if not y.folha:
-        for j in range(0, t):
-            z.filhos.append(y.filhos[j + t + 1])
-
+        z.filhos = y.filhos[t+1:]
+        y.filhos = y.filhos[:t+1]
+    
     x.filhos.insert(i + 1, z)
-    x.chaves.insert(i, y.chaves[t])
+    x.chaves.insert(i, meio)
 
-    y.chaves = y.chaves[0:t]
+    y.chaves = esq
 
 
 def insere_no_nodo(x: Nodo, c, t:int):
-    i = len(x.chaves) - 1
-
     if x.folha:
         bisect.insort(x.chaves, c)
     else:
-        while i >= 0 and c < x.chaves[i]:
-            i = i - 1
-        y = x.filhos[i + 1]
+        i = 0
+        while i < len(x.chaves) and x.chaves[i] < c:
+            i = i + 1
+            
+        try:
+            y = x.filhos[i]
+        except IndexError as e:
+            print(f'len filhos: {len(x.filhos)}, index: {i}') 
+            print(f'chaves: {x.chaves}')
+            raise e
+        
         overflow = insere_no_nodo(y, c, t)
         if overflow:
-            particiona_filhos_arvore_b(x, i + 1, t)
+            particiona_filhos_arvore_b(x, i, t)
 
     return len(x.chaves) > 2*t
 
