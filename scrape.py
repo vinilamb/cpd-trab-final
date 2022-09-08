@@ -2,7 +2,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from sqlalchemy import column
 
-HTML_FILE = 'List of PlayStation 2 games (A–K) - Wikipedia.html'
+HTML_FILE = 'List of PlayStation 2 games (A-K) - Wikipedia.html'
 DOT = '•'
 
 with open(HTML_FILE, encoding='utf-8') as fp:
