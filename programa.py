@@ -1,7 +1,8 @@
 import arvoreb
 import pandas as pd
 
-arvore = arvoreb.ArvoreB(2)
+ORDEM = 4
+ARVORE = arvoreb.ArvoreB(ORDEM)
 
 def carrega_dados_arquivo_original():
     df = pd.read_csv('jogos_play2.csv')
@@ -10,7 +11,6 @@ def carrega_dados_arquivo_original():
         arvore.insere(arvoreb.Registro(ix, row[0]))
     print('terminou de carregar')
 
-
 if __name__ == '__main__':
     print('Trabalho Final de CPD - 2022/2')
     print('Por Vinicius Lamb Magalhães e Gabriel Zanini')
@@ -18,10 +18,10 @@ if __name__ == '__main__':
 
     while True:
         try:
-            inputStr = input("?: ")
+            inputStr = input("?: ").strip()
 
             if inputStr == 'carregar':
-                arvore = arvoreb.ArvoreB(2)
+                arvore = arvoreb.ArvoreB(ORDEM)
                 carrega_dados_arquivo_original()
 
             if inputStr.startswith('b'):
@@ -31,6 +31,7 @@ if __name__ == '__main__':
                     print(f'Encontrado: {valor.valor}')
                 else:
                     print("Sem valor com chave " + str(chave))
+
         except KeyboardInterrupt:
             print("Encerrando o programa.")
             break
