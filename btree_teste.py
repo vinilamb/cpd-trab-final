@@ -28,7 +28,7 @@ def gera_grafo_arvore():
 
     dot.render(outfile='grafo.png', cleanup=True)
 
-while True:
+while False:
     try:
         inputStr = input("Digite um número e um valor para inserir na árvore B: ")
     except KeyboardInterrupt: break
@@ -67,12 +67,16 @@ while True:
 
     # gera_grafo_arvore()
 
-# arvore.insere(btree.Registro(1, 'João'))
-# arvore.insere(btree.Registro(2, 'Maria'))
-# arvore.insere(btree.Registro(3, 'José'))
-# arvore.insere(btree.Registro(4, 'Pedro'))
-# arvore.insere(btree.Registro(5, 'Marcos'))
-# arvore.insere(btree.Registro(6, 'André'))
-# arvore.insere(btree.Registro(7, 'Roberto'))
-# arvore.insere(btree.Registro(8, 'Antônio'))
-# arvore.insere(btree.Registro(9, 'Miguel'))
+arvore.insere(btree.Registro(1, 'João'))
+arvore.insere(btree.Registro(20, 'Maria'))
+arvore.insere(btree.Registro(30, 'José'))
+arvore.insere(btree.Registro(40, 'Pedro'))
+arvore.insere(btree.Registro(550, 'Marcos'))
+arvore.insere(btree.Registro(600, 'André'))
+arvore.insere(btree.Registro(700, 'Roberto'))
+arvore.insere(btree.Registro(888, 'Antônio'))
+arvore.insere(btree.Registro(9000, 'Miguel'))
+arvore.insere(btree.Registro(2, 'Maicon'))
+arvore.insere(btree.Registro(44, 'Robinson'))
+
+btree.traverse_asc(arvore.raiz)

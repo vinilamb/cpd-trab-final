@@ -20,7 +20,7 @@ def busca_nodo(nodo: 'Nodo', chave):
     
     return busca_nodo(nodo, chave)
 
-def busca_nodo_2(nodo: 'Nodo', chave):
+def busca_valor_por_chave(nodo: 'Nodo', chave):
     i = 0
     while i < len(nodo.registros) and nodo.registros[i].chave < chave:
         i = i + 1
@@ -29,7 +29,7 @@ def busca_nodo_2(nodo: 'Nodo', chave):
         return nodo.registros[i]
 
     if not nodo.folha:
-        return busca_nodo_2(nodo.filhos[i], chave)
+        return busca_valor_por_chave(nodo.filhos[i], chave)
     else:
         return None
 
@@ -84,6 +84,17 @@ def insere_arvore(arvore: 'ArvoreB', registro: 'Registro'):
         s.filhos.append(r)
         particiona_filhos_arvore_b(s, 0, arvore.ordem)
 
+def traverse_asc(nodo: 'Nodo'):
+    if nodo.folha:
+        for r in nodo.registros:
+            print(r)
+        return
+    
+    for i, n in enumerate(nodo.filhos):
+        traverse_asc(n)
+        if i < len(nodo.registros):
+            print(nodo.registros[i])
+
 class Registro(NamedTuple):
     chave:any
     valor:any
@@ -102,3 +113,6 @@ class ArvoreB:
 
     def insere(self, registro: Registro):
         insere_arvore(self, registro)
+
+    def busca(self, chave):
+        return busca_valor_por_chave(self.raiz, chave)
