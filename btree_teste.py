@@ -30,16 +30,49 @@ def gera_grafo_arvore():
 
 while True:
     try:
-        comStr = input("Digite um número para inserir na árvore B: ")
+        inputStr = input("Digite um número e um valor para inserir na árvore B: ")
     except KeyboardInterrupt: break
 
-    try:
-        numero = int(comStr)
-    except:
-        print("NÚMERO!!!")
-        continue
-    
-    reg = btree.Registro(numero, None)
-    arvore.insere(reg)
+    i_space = inputStr.find(' ')
+    if i_space != -1:
+        numOrCmd = inputStr[:i_space]
+        resto = inputStr[i_space+1:]
+        
+        if numOrCmd == 'b':  
+            # busca
+            valor = btree.busca_nodo_2(arvore.raiz, int(resto))
+            if valor:
+                print(f'Encontrado: ' + valor.__repr__())
+            else:
+                print(f'chave {int(resto)} sem valor')
 
-    gera_grafo_arvore()
+        elif numOrCmd == 'r':
+            pass
+        elif numOrCmd == 'i': 
+            i_space = resto.find(' ')
+            if i_space != -1:
+                chave_str = resto[:i_space]
+                valor = resto[i_space+1:].strip()
+            else:
+                chave_str = resto
+                valor=None
+            
+            chave = int(chave_str)
+            arvore.insere(btree.Registro(chave, valor))
+
+            print('inseridos ' + str((chave, valor)))
+
+    # reg = btree.Registro(numero, valor)
+    # arvore.insere(reg)
+
+    # gera_grafo_arvore()
+
+# arvore.insere(btree.Registro(1, 'João'))
+# arvore.insere(btree.Registro(2, 'Maria'))
+# arvore.insere(btree.Registro(3, 'José'))
+# arvore.insere(btree.Registro(4, 'Pedro'))
+# arvore.insere(btree.Registro(5, 'Marcos'))
+# arvore.insere(btree.Registro(6, 'André'))
+# arvore.insere(btree.Registro(7, 'Roberto'))
+# arvore.insere(btree.Registro(8, 'Antônio'))
+# arvore.insere(btree.Registro(9, 'Miguel'))

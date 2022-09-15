@@ -1,5 +1,4 @@
 import bisect
-from turtle import register_shape
 from typing import NamedTuple
 
 def busca_nodo(nodo: 'Nodo', chave):
@@ -20,6 +19,19 @@ def busca_nodo(nodo: 'Nodo', chave):
         nodo = nodo.filhos[indiceChave + 1]
     
     return busca_nodo(nodo, chave)
+
+def busca_nodo_2(nodo: 'Nodo', chave):
+    i = 0
+    while i < len(nodo.registros) and nodo.registros[i].chave < chave:
+        i = i + 1
+    
+    if i < len(nodo.registros) and nodo.registros[i].chave == chave:
+        return nodo.registros[i]
+
+    if not nodo.folha:
+        return busca_nodo_2(nodo.filhos[i], chave)
+    else:
+        return None
 
 # No tem 2t + 1 chaves
 def particiona_filhos_arvore_b(pai: 'Nodo', indice: int, ordem: int):
