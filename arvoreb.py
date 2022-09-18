@@ -1,25 +1,6 @@
 import bisect
 from typing import NamedTuple
 
-def busca_nodo(nodo: 'Nodo', chave):
-    indiceChave = 0
-
-    while indiceChave < len(nodo.chaves) and chave > nodo.chaves[indiceChave]:
-        indiceChave = indiceChave + 1
-    
-    if indiceChave < len(nodo.chaves) and chave == nodo.chave[indiceChave]:
-        return nodo
-
-    if nodo.folha:
-        return None
-
-    if indiceChave < len(nodo.chaves):
-        nodo = nodo.filhos[indiceChave]
-    else:
-        nodo = nodo.filhos[indiceChave + 1]
-    
-    return busca_nodo(nodo, chave)
-
 def busca_valor_por_chave(nodo: 'Nodo', chave):
     i = 0
     while i < len(nodo.registros) and nodo.registros[i].chave < chave:
