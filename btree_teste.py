@@ -1,4 +1,4 @@
-import arvoreb as btree
+import bplus as btree
 import graphviz
 
 arvore = btree.ArvoreB(2)
@@ -9,14 +9,13 @@ def gera_grafo_arvore():
     dot = graphviz.Graph()
     
     def nodeText(nodo: btree.Nodo):
-        print(nodo.registros)
-        return ";".join(str(r.chave) for r in nodo.registros)
+        return ";".join(str(r) for r in nodo.chaves)
 
-    ordem = 0
+    ordem = 1
     def addNode(node, nomePai=None):
         nonlocal ordem
         nome = f'n{ordem}'
-        dot.node(nome, label=nodeText(node))
+        dot.node(nome, label=nodeText(node), )
         if nomePai:
             dot.edge(nomePai, nome)
         if not node.folha:
@@ -28,55 +27,38 @@ def gera_grafo_arvore():
 
     dot.render(outfile='grafo.png', cleanup=True)
 
-while False:
-    try:
-        inputStr = input("Digite um número e um valor para inserir na árvore B: ")
-    except KeyboardInterrupt: break
+# while True:
+#     try:
+#         inputStr = input("Digite um número e um valor (opcional) para inserir na árvore B: ")
+#     except KeyboardInterrupt: break
 
-    i_space = inputStr.find(' ')
-    if i_space != -1:
-        numOrCmd = inputStr[:i_space]
-        resto = inputStr[i_space+1:]
-        
-        if numOrCmd == 'b':  
-            # busca
-            valor = btree.busca_nodo_2(arvore.raiz, int(resto))
-            if valor:
-                print(f'Encontrado: ' + valor.__repr__())
-            else:
-                print(f'chave {int(resto)} sem valor')
+#     tokens = inputStr.split()
+#     chave = tokens[0]
+#     if len(tokens) > 1:
+#         valor = tokens[1]
+#     else:
+#         valor = None
 
-        elif numOrCmd == 'r':
-            pass
-        elif numOrCmd == 'i': 
-            i_space = resto.find(' ')
-            if i_space != -1:
-                chave_str = resto[:i_space]
-                valor = resto[i_space+1:].strip()
-            else:
-                chave_str = resto
-                valor=None
-            
-            chave = int(chave_str)
-            arvore.insere(btree.Registro(chave, valor))
+#     chave = int(chave)
 
-            print('inseridos ' + str((chave, valor)))
+#     arvore.insere(chave, valor)
+#     print('inseridos ' + str((chave, valor)))
 
-    # reg = btree.Registro(numero, valor)
-    # arvore.insere(reg)
+#     gera_grafo_arvore()
 
-    # gera_grafo_arvore()
+for i in range(0, 100): arvore.insere(i, None)
 
-arvore.insere(btree.Registro(1, 'João'))
-arvore.insere(btree.Registro(20, 'Maria'))
-arvore.insere(btree.Registro(30, 'José'))
-arvore.insere(btree.Registro(40, 'Pedro'))
-arvore.insere(btree.Registro(550, 'Marcos'))
-arvore.insere(btree.Registro(600, 'André'))
-arvore.insere(btree.Registro(700, 'Roberto'))
-arvore.insere(btree.Registro(888, 'Antônio'))
-arvore.insere(btree.Registro(9000, 'Miguel'))
-arvore.insere(btree.Registro(2, 'Maicon'))
-arvore.insere(btree.Registro(44, 'Robinson'))
+gera_grafo_arvore()
+# arvore.insere(1, 'João')
+# arvore.insere(20, 'Maria')
+# arvore.insere(30, 'José')
+# arvore.insere(btree.Registro(40, 'Pedro')
+# arvore.insere(btree.Registro(550, 'Marcos'))
+# arvore.insere(btree.Registro(600, 'André'))
+# arvore.insere(btree.Registro(700, 'Roberto'))
+# arvore.insere(btree.Registro(888, 'Antônio'))
+# arvore.insere(btree.Registro(9000, 'Miguel'))
+# arvore.insere(btree.Registro(2, 'Maicon'))
+# arvore.insere(btree.Registro(44, 'Robinson'))
 
-btree.traverse_asc(arvore.raiz)
+# btree.traverse_asc(arvore.raiz)

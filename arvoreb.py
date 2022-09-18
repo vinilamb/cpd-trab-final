@@ -14,7 +14,7 @@ def busca_valor_por_chave(nodo: 'Nodo', chave):
     else:
         return None
 
-# No tem 2t + 1 chaves
+# Nodo tem 2t + 1 chaves
 def particiona_filhos_arvore_b(pai: 'Nodo', indice: int, ordem: int):
     nodoMaior = Nodo()
     nodoMenor:Nodo = pai.filhos[indice]
