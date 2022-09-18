@@ -1,11 +1,11 @@
-from operator import index
 from typing import List
-import arvoreb
+import bplus as arvoreb
 import pandas as pd
+from collections import OrderedDict
 
 ORDEM = 4
 ARVORE = arvoreb.ArvoreB(ORDEM)
-INDICE_POR_TITULO = {}
+INDICE_POR_TITULO = OrderedDict()
 
 def carrega_dados_arquivo_original():
     global INDICE_POR_TITULO
@@ -13,15 +13,9 @@ def carrega_dados_arquivo_original():
     df = pd.read_csv('jogos_play2.csv')
     print(f'carregando {len(df)} registro(s)')
 
-    registros = []
     for ix, row in df.iterrows():
-        r = arvoreb.Registro(ix, row[0])
-        ARVORE.insere(r)
-        registros.append(r)
-
-    INDICE_POR_TITULO = indexar(registros)
+        ARVORE.insere(ix, row[0])
     
-    print(INDICE_POR_TITULO.keys())
     print('terminou de carregar')
 
 table = {ord(ch): ord(' ') for ch in list(r'/\?&%$#@!()|:,;[]-_•#.+')}
@@ -31,15 +25,15 @@ def tokenizar(string: str):
     string = string.translate(table)
     return string.split()
 
-def indexar(listaRegistros: List[arvoreb.Registro]):
-    dictInvertido = {}
-    for r in listaRegistros:
-        tkns = tokenizar(r.valor)
+def indexar():
+    dictInvertido = OrderedDict()
+    for chave, valor in ARVORE.iterar_sequencial():
+        tkns = tokenizar(valor)
         for t in tkns:
             if t in dictInvertido:
-                dictInvertido[t].append(r.chave)
+                dictInvertido[t].append(chave)
             else:
-                dictInvertido[t] = [r.chave]
+                dictInvertido[t] = [chave]
     return dictInvertido
 
 if __name__ == '__main__':
@@ -57,24 +51,36 @@ if __name__ == '__main__':
 
             if inputStr.startswith('b'):
                 chave = int(inputStr[1:].strip())
-                valor = arvoreb.busca_valor_por_chave(ARVORE.raiz, chave)
+                valor = arvoreb.busca_valor(ARVORE.raiz, chave)
                 if valor:
-                    print(f'Encontrado: {valor.valor}')
+                    print(f'Encontrado: {valor}')
                 else:
                     print("Sem valor com chave " + str(chave))
 
             if inputStr.startswith('titulo'):
                 termoBusca = inputStr[7:].strip().lower()
                 if termoBusca in INDICE_POR_TITULO:
-                    print(f'Encontrados registros: {INDICE_POR_TITULO[termoBusca]}')
+                    print(f'Encontrados {len(INDICE_POR_TITULO[termoBusca])} registros.')
                     for chave in INDICE_POR_TITULO[termoBusca]:
-                        valor = arvoreb.busca_valor_por_chave(ARVORE.raiz, chave)
-                        print(valor)
+                        valor = arvoreb.busca_valor(ARVORE.raiz, chave)
+                        print(f'{chave}: {valor}')
                 else:
                     print(f'Nenhum registro encontrado. Termo="{termoBusca}"')         
 
-            if inputStr.startswith('list'):
-                arvoreb.traverse_asc(ARVORE.raiz)
+            if inputStr.startswith('listar'):
+                print('listando todos os valores')
+                for chave, valor in ARVORE.iterar_sequencial():
+                    print(f'{chave}: {valor}')
+                
+            if inputStr.startswith('indexar'):
+                print('indexando termos no dicionários')
+                INDICE_POR_TITULO = indexar()
+                print(f'obtidos {len(INDICE_POR_TITULO)} termos')
+
+            if inputStr.startswith('dicionario'):
+                for k, postings in INDICE_POR_TITULO.items():
+                    print(f'{k}: {len(postings)} -> {postings}')
+
         except KeyboardInterrupt:
             print("Encerrando o programa.")
             break

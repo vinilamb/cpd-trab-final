@@ -177,7 +177,20 @@ def nodo_remove_simples(n: Nodo, pai: Nodo, i, chave, ordem):
             # Fusão à esquerda
             nodos_fusao(n.esq, n, pai, i)
         
-        
+def busca_nodo(n:Nodo, chave):
+    if n.folha:
+        return n
+    i = 0
+    while i < len(n.chaves) and chave >= n.chaves[i]:
+        i = i + 1
+    return busca_nodo(n.filhos[i], chave)
+
+def busca_valor(n:Nodo, chave):
+    n = busca_nodo(n, chave)
+    try:
+        return n.valores[n.chaves.index(chave)]
+    except ValueError:
+        return None
 
 class ArvoreB:
     def __init__(self, ordem:int = 3):
@@ -197,5 +210,10 @@ class ArvoreB:
     def busca(self, chave):
         pass
 
-    def remove(self, chave):
-        underflow = self.raiz.remove(chave)
+    def iterar_sequencial(self):
+        n = self.raiz
+        while not n.folha:
+            n = n.filhos[0]
+        while n:
+            for i in range(0, len(n.chaves)): yield (n.chaves[i], n.valores[i])
+            n = n.dir

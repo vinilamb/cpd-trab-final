@@ -97,3 +97,4 @@ class ArvoreB:
 
     def busca(self, chave):
         return busca_valor_por_chave(self.raiz, chave)
+
