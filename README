@@ -2,5 +2,7 @@ Necessário instalar as bibliotecas:
   - pandas
   - lxml
 
+Se falta alguma, o Python vai avisar. Daí é só rodar "pip install [nome da biblioteca]" que o pip cuida de tudo.
+
 Rodar o programa:
 python ./programa.py
