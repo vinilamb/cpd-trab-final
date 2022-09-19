@@ -4,7 +4,7 @@ from collections import OrderedDict
 import pickle
 import sys
 
-# Aumenta o limite de recursão para permitir serializar a árvore
+# Aumenta o limite de recursão para permitir serializar a árvore com ordem baixa
 sys.setrecursionlimit(10000)
 
 ARQ_DAT = 'JOGOS.DAT'
