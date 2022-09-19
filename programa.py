@@ -1,3 +1,4 @@
+from inspect import get_annotations
 import bplus as arvoreb
 import pandas as pd
 from collections import OrderedDict
@@ -17,12 +18,16 @@ class Jogo():
 sys.setrecursionlimit(10000)
 
 ARQ_DAT = 'JOGOS.DAT'
+ARQ_IX_TITULO = 'INDEX.DAT'
+ARQ_IX_ANO = 'YEAR.DAT'
+
 ARQ_AK = 'jogos_play2_A-K.csv'
 ARQ_LZ = 'jogos_play2_L-Z.csv'
 
 ORDEM = 10
 ARVORE = arvoreb.ArvoreB(ORDEM)
 INDICE_POR_TITULO = OrderedDict()
+INDICE_POR_ANO = OrderedDict()
 
 def carrega_arquivo(arquivo):
     df = pd.read_csv(arquivo)
@@ -40,19 +45,32 @@ def tokenizar(string: str):
     string = string.translate(table)
     return string.split()
 
+def data_ano(data:str):
+    try:
+        ano = data[:data.index('-')]
+        return ano
+    except:
+        return '666' # ano com erro
+
 def add_posting(dict: dict, bucket, chave):
     if bucket in dict:
         dict[bucket].append(chave)
     else:
         dict[bucket] = [chave]
 
-def indexar():
-    dictInvertido = OrderedDict()
+def gerar_indices():
+    dictTitulo = OrderedDict()
+    dictAno = OrderedDict()
+
     for chave, valor in ARVORE.iterar_sequencial():
         tkns = tokenizar(valor.titulo)
         for t in tkns:
-            add_posting(dictInvertido, t, chave)
-    return dictInvertido
+            add_posting(dictTitulo, t, chave)
+
+        ano = data_ano(valor.data)
+        add_posting(dictAno, ano, chave)
+
+    return (dictTitulo, dictAno)
 
 def indexa_novo_jogo(chave, j: Jogo):
     for t in tokenizar(j.titulo):
@@ -94,6 +112,10 @@ def cmd_titulo(argLine):
     else:
         print(f'Nenhum registro encontrado. Termo="{termoBusca}"')         
 
+def get_paginate_options(argLine: str):
+    rev = False
+    top = None
+
 def cmd_listar(argLine: str):
     rev = False
     top = None
@@ -105,7 +127,7 @@ def cmd_listar(argLine: str):
             try:
                 top = int(tokens[tokens.index('top') + 1])
             except:
-                print('ERRO: número necesário depois do top')
+                print('ERRO: número necessário depois do top')
                 return
             if top <= 0:
                 print('ERRO: argumento de top deve ser inteiro positivo')
@@ -122,13 +144,16 @@ def cmd_listar(argLine: str):
 
 def cmd_indexar():
     global INDICE_POR_TITULO
+    global INDICE_POR_ANO
+
     if len(ARVORE) == 0:
         print('A árvore está vazia, certifique-se de rodar o comando "carregar" ou "restaurar" antes de tentar gerar o índice.')
         return
 
     print('indexando termos no dicionários')
-    INDICE_POR_TITULO = indexar()
-    print(f'obtidos {len(INDICE_POR_TITULO)} termos')
+    INDICE_POR_TITULO, INDICE_POR_ANO = gerar_indices()
+    print(f'titulo: obtidos {len(INDICE_POR_TITULO)} termos')
+    print(f'ano: obtidos {len(INDICE_POR_ANO)} anos diferentes de lançamento')
 
 def cmd_dicionario():
     for k, postings in INDICE_POR_TITULO.items():
@@ -192,10 +217,18 @@ def cmd_novo_registro():
 
 
 TEXTO_AJUDA = """Comandos implementados:
-  carregar: carregar os arquivos de dados padrão
-  busca: busca o registro com a chave informada
-  titulo: busca os títulos por token
-  indexar: gera o índice por título"""
+  carregar   : carregar os arquivos de dados padrão
+  busca      : busca o registro com a chave informada
+  titulo     : busca os títulos por token
+  listar     : lista jogos cadastrados. aceita opções 'top N' e 'rev'
+  indexar    : gera o índice por título
+  dicionario : dump gigantesco dos termos e postings do dicionário
+  persistir  : persiste estado da árvore em JOGOS.DAT
+  restaurar  : restaura estado a partir do arquivo JOGOS.DAT
+  ordem      : altera a ordem da árvore
+  ajuda      : mostra esta mensagem de ajuda
+  inserir    : cadastra um novo registro"""
+
 
 if __name__ == '__main__':
     print('=' * 65)
