@@ -1,4 +1,3 @@
-from re import T, U
 import bplus as arvoreb
 import pandas as pd
 from collections import OrderedDict
@@ -21,7 +20,7 @@ ARQ_DAT = 'JOGOS.DAT'
 ARQ_AK = 'jogos_play2_A-K.csv'
 ARQ_LZ = 'jogos_play2_L-Z.csv'
 
-ORDEM = 2
+ORDEM = 10
 ARVORE = arvoreb.ArvoreB(ORDEM)
 INDICE_POR_TITULO = OrderedDict()
 
