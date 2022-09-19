@@ -23,7 +23,6 @@ def carrega_arquivo(arquivo):
 
 table = {ord(ch): ord(' ') for ch in list(r'/\?&%$#@!()|:,;[]-_•#.+')}
 def tokenizar(string: str):
-    global table
     string = string.lower()
     string = string.translate(table)
     return string.split()
@@ -39,78 +38,127 @@ def indexar():
                 dictInvertido[t] = [chave]
     return dictInvertido
 
-if __name__ == '__main__':
-    print('Trabalho Final de CPD - 2022/2')
-    print('Por Vinicius Lamb Magalhães e Gabriel Zanini')
-    print('Banco de dados de jogos de PlayStation 2')
+### Implementação dos comandos
+def cmd_carregar():
+    global ARVORE
+    ARVORE = arvoreb.ArvoreB(ORDEM)
+    carrega_arquivo(ARQ_AK)
+    carrega_arquivo(ARQ_LZ)
 
+def cmd_busca(argLine: str):
+    try:
+        chave = int(argLine)
+        valor = arvoreb.busca_valor(ARVORE.raiz, chave)
+    except:
+        print('ERRO: Chave primária não informada.')
+
+    if valor:
+        print(f'Encontrado: {valor}')
+    else:
+        print("Sem valor com chave " + str(chave))
+
+def cmd_titulo(argLine):
+    termoBusca = argLine.strip().lower()
+    if termoBusca in INDICE_POR_TITULO:
+        print(f'Encontrados {len(INDICE_POR_TITULO[termoBusca])} registros.')
+        for chave in INDICE_POR_TITULO[termoBusca]:
+            valor = arvoreb.busca_valor(ARVORE.raiz, chave)
+            print(f'{chave}: {valor}')
+    else:
+        print(f'Nenhum registro encontrado. Termo="{termoBusca}"')         
+
+def cmd_listar():
+    print('listando todos os valores')
+    for chave, valor in ARVORE.iterar_sequencial():
+        print(f'{chave}: {valor}')
+
+def cmd_indexar():
+    global INDICE_POR_TITULO
+    print('indexando termos no dicionários')
+    INDICE_POR_TITULO = indexar()
+    print(f'obtidos {len(INDICE_POR_TITULO)} termos')
+
+def cmd_dicionario():
+    for k, postings in INDICE_POR_TITULO.items():
+        print(f'{k}: {len(postings)} -> {postings}')
+
+def cmd_persistir():
+    print(f'gravando em "{ARQ_DAT}"')
+    with open(ARQ_DAT, 'wb') as f:
+        pickle.dump(ARVORE, f)
+
+def cmd_restaurar():
+    print(f'restaurando de "{ARQ_DAT}"')
+    with open(ARQ_DAT, 'rb') as f:
+        ARVORE = pickle.load(f)
+
+def cmd_ordem(argLine):
+    try:
+        ordem = int(argLine)
+        if ordem == ORDEM:
+            print(f'ordem já é {ORDEM}')
+        novaArvore = arvoreb.ArvoreB(ordem)
+        for chave, valor in ARVORE.iterar_sequencial():
+            novaArvore.insere(chave, valor)
+        print(f'ordem alterada {ORDEM} -> {ordem}')
+        ORDEM = ordem
+        ARVORE = novaArvore
+    except ValueError:
+        print('informe a ordem como um número')
+
+def get_command(inputStr:str):
+    inputStr = inputStr.strip()
+    cmd = resto = None
+    try:
+        i = inputStr.index(' ')
+        cmd = inputStr[:i]
+        resto = inputStr[i:].lstrip()
+    except ValueError:
+        cmd = inputStr
+    return (cmd, resto)
+
+TEXTO_AJUDA = """Comandos implementados:
+  carregar: carregar os arquivos de dados padrão
+  busca: busca o registro com a chave informada
+  titulo: busca os títulos por token
+  indexar: gera o índice por título"""
+
+if __name__ == '__main__':
+    print('=' * 65)
+    print('| Trabalho Final de CPD - 2022/2')
+    print('| Banco de dados de jogos de PlayStation 2')
+    print('|  - Por Vinicius Lamb Magalhães e Gabriel Zanini © 2022')
+    print('=' * 65)
+    
+    # Loop principal
     while True:
         try:
-            inputStr = input("?: ").strip()
+            inputStr = input('?: ')
+            comando, restoDaLinha = get_command(inputStr)
 
-            if inputStr == 'carregar':
-                ARVORE = arvoreb.ArvoreB(ORDEM)
-                carrega_arquivo(ARQ_AK)
-                carrega_arquivo(ARQ_LZ)
-
-            elif inputStr.startswith('b'):
-                chave = int(inputStr[1:].strip())
-                valor = arvoreb.busca_valor(ARVORE.raiz, chave)
-                if valor:
-                    print(f'Encontrado: {valor}')
-                else:
-                    print("Sem valor com chave " + str(chave))
-
-            elif inputStr.startswith('titulo'):
-                termoBusca = inputStr[7:].strip().lower()
-                if termoBusca in INDICE_POR_TITULO:
-                    print(f'Encontrados {len(INDICE_POR_TITULO[termoBusca])} registros.')
-                    for chave in INDICE_POR_TITULO[termoBusca]:
-                        valor = arvoreb.busca_valor(ARVORE.raiz, chave)
-                        print(f'{chave}: {valor}')
-                else:
-                    print(f'Nenhum registro encontrado. Termo="{termoBusca}"')         
-
-            elif inputStr.startswith('listar'):
-                print('listando todos os valores')
-                for chave, valor in ARVORE.iterar_sequencial():
-                    print(f'{chave}: {valor}')
-                
-            elif inputStr.startswith('indexar'):
-                print('indexando termos no dicionários')
-                INDICE_POR_TITULO = indexar()
-                print(f'obtidos {len(INDICE_POR_TITULO)} termos')
-
-            elif inputStr.startswith('dicionario'):
-                for k, postings in INDICE_POR_TITULO.items():
-                    print(f'{k}: {len(postings)} -> {postings}')
-
-            elif inputStr.startswith('persistir'):
-                print(f'gravando em "{ARQ_DAT}"')
-                with open(ARQ_DAT, 'wb') as f:
-                    pickle.dump(ARVORE, f)
-
-            elif inputStr.startswith('restaurar'):
-                print(f'restaurando de "{ARQ_DAT}"')
-                with open(ARQ_DAT, 'rb') as f:
-                    ARVORE = pickle.load(f)
-
-            elif inputStr.startswith('ordem'):
-                try:
-                    ordem = int(inputStr[5:])
-                    if ordem == ORDEM:
-                        print(f'ordem já é {ORDEM}')
-                    novaArvore = arvoreb.ArvoreB(ordem)
-                    for chave, valor in ARVORE.iterar_sequencial():
-                        novaArvore.insere(chave, valor)
-                    print(f'ordem alterada {ORDEM} -> {ordem}')
-                    ORDEM = ordem
-                    ARVORE = novaArvore
-                except ValueError:
-                    print('informe a ordem como um número')
-            
+            if comando == 'carregar':
+                cmd_carregar()
+            elif comando == 'busca':
+                cmd_busca(restoDaLinha)
+            elif comando == 'titulo':
+                cmd_titulo(restoDaLinha)
+            elif comando == 'listar':
+                cmd_listar()
+            elif comando == 'indexar':
+                cmd_indexar()
+            elif comando == 'dicionario':
+                cmd_dicionario()
+            elif comando == 'persistir':
+                cmd_persistir()
+            elif comando == 'restaurar':
+                cmd_restaurar()
+            elif comando == 'ordem':
+                cmd_ordem(restoDaLinha)
+            elif comando == 'ajuda':
+                print(TEXTO_AJUDA)
             else:
-                print('Comando desconhecido.')
+                print('Comando desconhecido. O comando "ajuda" lista os comandos implementados')
+        
         except KeyboardInterrupt:
             print("Encerrando o programa.")
             break
