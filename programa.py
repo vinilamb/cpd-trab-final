@@ -1,12 +1,17 @@
-from typing import List
 import bplus as arvoreb
 import pandas as pd
 from collections import OrderedDict
+import pickle
+import sys
 
+# Aumenta o limite de recursão para permitir serializar a árvore
+sys.setrecursionlimit(10000)
+
+ARQ_DAT = 'JOGOS.DAT'
 ARQ_AK = 'jogos_play2_L-Z.csv'
 ARQ_LZ = 'jogos_play2_A-K.csv'
 
-ORDEM = 4
+ORDEM = 2
 ARVORE = arvoreb.ArvoreB(ORDEM)
 INDICE_POR_TITULO = OrderedDict()
 
@@ -48,7 +53,7 @@ if __name__ == '__main__':
                 carrega_arquivo(ARQ_AK)
                 carrega_arquivo(ARQ_LZ)
 
-            if inputStr.startswith('b'):
+            elif inputStr.startswith('b'):
                 chave = int(inputStr[1:].strip())
                 valor = arvoreb.busca_valor(ARVORE.raiz, chave)
                 if valor:
@@ -56,7 +61,7 @@ if __name__ == '__main__':
                 else:
                     print("Sem valor com chave " + str(chave))
 
-            if inputStr.startswith('titulo'):
+            elif inputStr.startswith('titulo'):
                 termoBusca = inputStr[7:].strip().lower()
                 if termoBusca in INDICE_POR_TITULO:
                     print(f'Encontrados {len(INDICE_POR_TITULO[termoBusca])} registros.')
@@ -66,20 +71,46 @@ if __name__ == '__main__':
                 else:
                     print(f'Nenhum registro encontrado. Termo="{termoBusca}"')         
 
-            if inputStr.startswith('listar'):
+            elif inputStr.startswith('listar'):
                 print('listando todos os valores')
                 for chave, valor in ARVORE.iterar_sequencial():
                     print(f'{chave}: {valor}')
                 
-            if inputStr.startswith('indexar'):
+            elif inputStr.startswith('indexar'):
                 print('indexando termos no dicionários')
                 INDICE_POR_TITULO = indexar()
                 print(f'obtidos {len(INDICE_POR_TITULO)} termos')
 
-            if inputStr.startswith('dicionario'):
+            elif inputStr.startswith('dicionario'):
                 for k, postings in INDICE_POR_TITULO.items():
                     print(f'{k}: {len(postings)} -> {postings}')
 
+            elif inputStr.startswith('persistir'):
+                print(f'gravando em "{ARQ_DAT}"')
+                with open(ARQ_DAT, 'wb') as f:
+                    pickle.dump(ARVORE, f)
+
+            elif inputStr.startswith('restaurar'):
+                print(f'restaurando de "{ARQ_DAT}"')
+                with open(ARQ_DAT, 'rb') as f:
+                    ARVORE = pickle.load(f)
+
+            elif inputStr.startswith('ordem'):
+                try:
+                    ordem = int(inputStr[5:])
+                    if ordem == ORDEM:
+                        print(f'ordem já é {ORDEM}')
+                    novaArvore = arvoreb.ArvoreB(ordem)
+                    for chave, valor in ARVORE.iterar_sequencial():
+                        novaArvore.insere(chave, valor)
+                    print(f'ordem alterada {ORDEM} -> {ordem}')
+                    ORDEM = ordem
+                    ARVORE = novaArvore
+                except ValueError:
+                    print('informe a ordem como um número')
+            
+            else:
+                print('Comando desconhecido.')
         except KeyboardInterrupt:
             print("Encerrando o programa.")
             break

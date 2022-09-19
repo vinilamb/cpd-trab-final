@@ -42,8 +42,12 @@ class Nodo:
         nodoMaior.folha = nodoMenor.folha
 
         # liga os dois nodos
-        nodoMaior.esq = nodoMenor
-        nodoMenor.dir = nodoMaior
+        if nodoMenor.folha:
+            nodoMaior.esq = nodoMenor
+            nodoMaior.dir = nodoMenor.dir
+            if nodoMaior.dir:
+                nodoMaior.dir.esq = nodoMaior
+            nodoMenor.dir = nodoMaior
 
         # insere o nodoMaior no nodo pai
         meio = nodoMenor.chaves[ordem]
