@@ -3,20 +3,18 @@ import bplus as arvoreb
 import pandas as pd
 from collections import OrderedDict
 
+ARQ_AK = 'jogos_play2_L-Z.csv'
+ARQ_LZ = 'jogos_play2_A-K.csv'
+
 ORDEM = 4
 ARVORE = arvoreb.ArvoreB(ORDEM)
 INDICE_POR_TITULO = OrderedDict()
 
-def carrega_dados_arquivo_original():
-    global INDICE_POR_TITULO
-
-    df = pd.read_csv('jogos_play2.csv')
-    print(f'carregando {len(df)} registro(s)')
-
+def carrega_arquivo(arquivo):
+    df = pd.read_csv(arquivo)
+    print(f'carregando {len(df)} registro(s) de "{arquivo}"')
     for ix, row in df.iterrows():
-        ARVORE.insere(ix, row[0])
-    
-    print('terminou de carregar')
+        ARVORE.insere_valor(row[0])
 
 table = {ord(ch): ord(' ') for ch in list(r'/\?&%$#@!()|:,;[]-_•#.+')}
 def tokenizar(string: str):
@@ -47,7 +45,8 @@ if __name__ == '__main__':
 
             if inputStr == 'carregar':
                 ARVORE = arvoreb.ArvoreB(ORDEM)
-                carrega_dados_arquivo_original()
+                carrega_arquivo(ARQ_AK)
+                carrega_arquivo(ARQ_LZ)
 
             if inputStr.startswith('b'):
                 chave = int(inputStr[1:].strip())

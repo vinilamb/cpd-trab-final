@@ -1,4 +1,5 @@
 
+from multiprocessing.sharedctypes import Value
 from typing import List
 
 class Nodo:
@@ -197,8 +198,15 @@ class ArvoreB:
         self.raiz = Nodo()
         self.ordem = ordem
         self.raiz.folha = True
+        self.tipoChave = None
+        self.maiorChave = 0
 
     def insere(self, chave, valor):
+        if self.tipoChave and type(chave) != self.tipoChave():
+            raise ValueError(f'Tipo incorreto para chave, deve ser {self.tipoChave}')
+
+        if isinstance(chave, int) and chave > self.maiorChave: self.maiorChave = chave
+
         overflow = self.raiz.insere(chave, valor, self.ordem)
         if overflow:
             s = Nodo()
@@ -206,6 +214,11 @@ class ArvoreB:
             s.filhos.append(self.raiz)
             self.raiz = s
             s.particiona(0, self.ordem)
+
+    def insere_valor(self, valor):
+        """Insere um valor, gerando automaticamente chave inteira."""
+        chave = self.maiorChave + 1
+        self.insere(chave, valor)
 
     def busca(self, chave):
         pass
