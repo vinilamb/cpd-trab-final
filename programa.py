@@ -1,3 +1,4 @@
+from re import T
 import bplus as arvoreb
 import pandas as pd
 from collections import OrderedDict
@@ -86,15 +87,36 @@ def cmd_titulo(argLine):
     else:
         print(f'Nenhum registro encontrado. Termo="{termoBusca}"')         
 
-def cmd_listar():
+def cmd_listar(argLine: str):
+    rev = False
+    top = None
+    if argLine:
+        tokens = argLine.lower().split()
+        if 'rev' in tokens:
+            rev = True
+        if 'top' in tokens:
+            try:
+                top = int(tokens[tokens.index('top') + 1])
+            except:
+                print('ERRO: número necesário depois do top')
+                return
+            if top <= 0:
+                print('ERRO: argumento de top deve ser inteiro positivo')
+                return
+
     print('listando todos os valores')
-    for chave, valor in ARVORE.iterar_sequencial():
+    it = ARVORE.iterar_sequencial() if not rev else ARVORE.iterar_rev()
+    count = 1
+    for chave, valor in it:
         print(f'{chave}: {valor}')
+        if top and count == top:
+            break
+        count += 1
 
 def cmd_indexar():
     global INDICE_POR_TITULO
     if len(ARVORE) == 0:
-        print('A árvore está vazia, certifique-se de rodar o comando "carregar" antes de tentar gerar o índice.')
+        print('A árvore está vazia, certifique-se de rodar o comando "carregar" ou "restaurar" antes de tentar gerar o índice.')
         return
 
     print('indexando termos no dicionários')
@@ -148,7 +170,7 @@ TEXTO_AJUDA = """Comandos implementados:
 
 if __name__ == '__main__':
     print('=' * 65)
-    print('| Trabalho Final de CPD - 2022/2')
+    print('| Trabalho Final de CPD - 2022/1')
     print('| Banco de dados de jogos de PlayStation 2')
     print('|  - Por Vinicius Lamb Magalhães e Gabriel Zanini © 2022')
     print('=' * 65)
@@ -166,7 +188,7 @@ if __name__ == '__main__':
             elif comando == 'titulo':
                 cmd_titulo(restoDaLinha)
             elif comando == 'listar':
-                cmd_listar()
+                cmd_listar(restoDaLinha)
             elif comando == 'indexar':
                 cmd_indexar()
             elif comando == 'dicionario':

@@ -238,4 +238,13 @@ class ArvoreB:
             for i in range(0, len(n.chaves)): yield (n.chaves[i], n.valores[i])
             n = n.dir
 
+    def iterar_rev(self):
+        n = self.raiz
+        while not n.folha:
+            n = n.filhos[-1]
+        while n:
+            # de n.chaves - 1 até 0
+            for i in range(len(n.chaves) - 1, -1, -1): yield (n.chaves[i], n.valores[i])
+            n = n.esq
+ 
     def __len__(self): return self.numValores
