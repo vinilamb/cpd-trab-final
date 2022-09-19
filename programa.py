@@ -1,9 +1,10 @@
-from re import T
+from re import T, U
 import bplus as arvoreb
 import pandas as pd
 from collections import OrderedDict
 import pickle
 import sys
+import datetime
 
 class Jogo():
     def __init__(self, titulo, dev, data):
@@ -40,16 +41,23 @@ def tokenizar(string: str):
     string = string.translate(table)
     return string.split()
 
+def add_posting(dict: dict, bucket, chave):
+    if bucket in dict:
+        dict[bucket].append(chave)
+    else:
+        dict[bucket] = [chave]
+
 def indexar():
     dictInvertido = OrderedDict()
     for chave, valor in ARVORE.iterar_sequencial():
         tkns = tokenizar(valor.titulo)
         for t in tkns:
-            if t in dictInvertido:
-                dictInvertido[t].append(chave)
-            else:
-                dictInvertido[t] = [chave]
+            add_posting(dictInvertido, t, chave)
     return dictInvertido
+
+def indexa_novo_jogo(chave, j: Jogo):
+    for t in tokenizar(j.titulo):
+        add_posting(INDICE_POR_TITULO, t, chave)
 
 ### Implementação dos comandos
 def cmd_carregar():
@@ -162,6 +170,28 @@ def get_command(inputStr:str):
         cmd = inputStr
     return (cmd, resto)
 
+def cmd_novo_registro():
+    print('Cadastrando um novo jogo de Play2. Ctrl-C para cancelar')
+    try:
+        titulo = input('Titulo: ').strip()
+        dev = input('Desenvolvedor: ').strip()
+        while True:
+            data = input('Data de Lançamento: ').strip()
+            try:
+                _ = datetime.datetime.strptime(data, '%Y-%m-%d')
+            except ValueError:
+                print('ERRO: Data Inválida. Formato deve ser AAAA-MM-DD. Tente de novo.')
+                continue
+            break
+    except KeyboardInterrupt:
+        print('Ctrl-C detectado. Cancelando a inserção.')
+
+    jogo = Jogo(titulo, dev, data)
+    chave = ARVORE.insere_valor(jogo)
+    print(f'Título "{jogo.titulo}" inserido com chave {chave}.')
+    indexa_novo_jogo(chave, jogo)
+
+
 TEXTO_AJUDA = """Comandos implementados:
   carregar: carregar os arquivos de dados padrão
   busca: busca o registro com a chave informada
@@ -201,6 +231,8 @@ if __name__ == '__main__':
                 cmd_ordem(restoDaLinha)
             elif comando == 'ajuda':
                 print(TEXTO_AJUDA)
+            elif comando == 'inserir':
+                cmd_novo_registro()
             else:
                 print('Comando desconhecido. O comando "ajuda" lista os comandos implementados')
         

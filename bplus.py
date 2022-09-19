@@ -222,10 +222,11 @@ class ArvoreB:
 
         self.numValores += 1
 
-    def insere_valor(self, valor):
+    def insere_valor(self, valor) -> int:
         """Insere um valor, gerando automaticamente chave inteira."""
         chave = self.maiorChave + 1
         self.insere(chave, valor)
+        return chave
 
     def busca(self, chave):
         pass
