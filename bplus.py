@@ -204,6 +204,7 @@ class ArvoreB:
         self.raiz.folha = True
         self.tipoChave = None
         self.maiorChave = 0
+        self.numValores = 0
 
     def insere(self, chave, valor):
         if self.tipoChave and type(chave) != self.tipoChave():
@@ -218,6 +219,8 @@ class ArvoreB:
             s.filhos.append(self.raiz)
             self.raiz = s
             s.particiona(0, self.ordem)
+
+        self.numValores += 1
 
     def insere_valor(self, valor):
         """Insere um valor, gerando automaticamente chave inteira."""
@@ -234,3 +237,5 @@ class ArvoreB:
         while n:
             for i in range(0, len(n.chaves)): yield (n.chaves[i], n.valores[i])
             n = n.dir
+
+    def __len__(self): return self.numValores

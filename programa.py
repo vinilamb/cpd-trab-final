@@ -4,6 +4,14 @@ from collections import OrderedDict
 import pickle
 import sys
 
+class Jogo():
+    def __init__(self, titulo, dev, data):
+        self.titulo = titulo
+        self.dev = dev
+        self.data = data
+    def __str__(self):
+        return f'"{self.titulo}", por {self.dev}, lançado em {self.data}'
+
 # Aumenta o limite de recursão para permitir serializar a árvore com ordem baixa
 sys.setrecursionlimit(10000)
 
@@ -19,7 +27,11 @@ def carrega_arquivo(arquivo):
     df = pd.read_csv(arquivo)
     print(f'carregando {len(df)} registro(s) de "{arquivo}"')
     for ix, row in df.iterrows():
-        ARVORE.insere_valor(row[0])
+        titulo = row[0]
+        dev = row[1]
+        data = row[2]
+        jogo = Jogo(titulo, dev, data)
+        ARVORE.insere_valor(jogo)
 
 table = {ord(ch): ord(' ') for ch in list(r'/\?&%$#@!()|:,;[]-_•#.+')}
 def tokenizar(string: str):
@@ -30,7 +42,7 @@ def tokenizar(string: str):
 def indexar():
     dictInvertido = OrderedDict()
     for chave, valor in ARVORE.iterar_sequencial():
-        tkns = tokenizar(valor)
+        tkns = tokenizar(valor.titulo)
         for t in tkns:
             if t in dictInvertido:
                 dictInvertido[t].append(chave)
@@ -58,6 +70,13 @@ def cmd_busca(argLine: str):
         print("Sem valor com chave " + str(chave))
 
 def cmd_titulo(argLine):
+    if not argLine:
+        print('ERRO: Informe um termo para busca.')
+        return
+    
+    if len(INDICE_POR_TITULO) == 0:
+        print('O dicionário está vazio. Tenha certeza de executar o comando "indexar" antes de tentar fazer uma busca.')
+
     termoBusca = argLine.strip().lower()
     if termoBusca in INDICE_POR_TITULO:
         print(f'Encontrados {len(INDICE_POR_TITULO[termoBusca])} registros.')
@@ -74,6 +93,10 @@ def cmd_listar():
 
 def cmd_indexar():
     global INDICE_POR_TITULO
+    if len(ARVORE) == 0:
+        print('A árvore está vazia, certifique-se de rodar o comando "carregar" antes de tentar gerar o índice.')
+        return
+
     print('indexando termos no dicionários')
     INDICE_POR_TITULO = indexar()
     print(f'obtidos {len(INDICE_POR_TITULO)} termos')
