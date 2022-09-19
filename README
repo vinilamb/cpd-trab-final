@@ -1,0 +1,6 @@
+Necessário instalar as bibliotecas:
+  - pandas
+  - lxml
+
+Rodar o programa:
+python ./programa.py

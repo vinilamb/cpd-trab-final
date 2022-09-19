@@ -8,8 +8,8 @@ import sys
 sys.setrecursionlimit(10000)
 
 ARQ_DAT = 'JOGOS.DAT'
-ARQ_AK = 'jogos_play2_L-Z.csv'
-ARQ_LZ = 'jogos_play2_A-K.csv'
+ARQ_AK = 'jogos_play2_A-K.csv'
+ARQ_LZ = 'jogos_play2_L-Z.csv'
 
 ORDEM = 2
 ARVORE = arvoreb.ArvoreB(ORDEM)

@@ -33,6 +33,8 @@ def process_url_dataset(url):
   file_name = 'jogos_play2'
   file_name = file_name + '_' + x[ x.find('(') + len('('):x.rfind(')')]
 
+  file_name = file_name.replace('–', '-') # remove travessão e troca por hífen
+
   # Generating CSV
   df.to_csv(file_name + '.csv', index=False)
 
